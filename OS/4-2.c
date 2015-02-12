@@ -1,0 +1,57 @@
+#include <stdio.h>     /* printf */
+#include <stdlib.h>    /* exit */
+#include <unistd.h>    /* fork */
+#include <sys/wait.h>  /* waitpid */
+#include <sys/types.h> /* pid_t */
+
+void process(int number, int time) {
+  printf("Process %d kjører\n", number);
+  sleep(time);
+  printf("Process %d kjørte i %d sekunder\n", number, time);
+}
+
+int main(void) {
+  int p0, p1, p2, p3, p4, p5;
+  
+  p0 = fork();    /* process 0 */
+  if (p0 == 0) {
+    process(0,1);
+    return 0;
+  }
+
+  p2 = fork();    /* process 2 */
+  if (p2 == 0) {
+    process(2,3);
+    return 0;
+  }
+
+  waitpid(p0, NULL, 0);
+  p1 = fork();    /* process 1 */
+  if (p1 == 0) {
+    process(1,2);
+    return 0;
+  }
+
+  p4 = fork();    /* process 4 */
+  if (p4 == 0) {
+    process(4,3);
+    return 0;
+  }
+
+  waitpid(p1, NULL, 0);
+  waitpid(p2, NULL, 0);
+  p3 = fork();    /* process 3 */
+  if (p3 == 0) {
+    process(3,2);
+    return 0;
+  }
+
+  waitpid(p4, NULL, 0);
+  p5 = fork();    /* process 5 */
+  if (p5 == 0) {
+    process(5,3);
+    return 0;
+  }
+  waitpid(p5, NULL, 0);
+  return 0;
+}
